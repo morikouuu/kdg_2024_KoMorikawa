@@ -1,0 +1,11 @@
+a{
+    text-decoration: none;
+}
+
+.custom-image {
+    width: 40px; /* 横幅を画面全体に */
+    height: auto; /* アスペクト比を維持 */
+    
+    }
+
+

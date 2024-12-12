@@ -1,0 +1,24 @@
+{% extends '../base.html' %} {% block content %}
+<head>
+	<title>ブログ管理サイト</title>
+</head>
+<h1 style="text-align: center">My Blog</h1>
+
+<div style="width: 70%; margin: 0px auto">
+	<hr />
+	{% for blog in blogs %}
+	<div>
+		<h3>{{ blog.title }}</h3>
+		<div>{{ blog.text | truncatechars:100 }}</div>
+	</div>
+	<div style="text-align: right">
+		<a href="{% url 'blogs:detail' pk=blog.id %}">記事を読む</a>
+	</div>
+	<hr />
+
+	{% endfor %}
+	<div>
+		<a href="{% url 'blogs:create' %}">新規</a>
+	</div>
+</div>
+{% endblock %}
