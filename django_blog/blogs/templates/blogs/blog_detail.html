@@ -1,0 +1,64 @@
+{% extends '../base.html' %} {% block content %}
+<head>
+	<title>ブログ</title>
+</head>
+<body>
+	<h1 style="text-align: center">{{ blog.title }}</h1>
+	<div style="width: 70%; margin: 0px auto">
+		{% if blog.picture %}
+			<div class = "container"></div>
+			<img src="{{ blog.picture.url }}" alt="Blog Image" class img/>
+		{% endif %}
+		</div>
+		
+		<div style="text-align: center; margin-top: 50px">
+			<a href="{% url 'blogs:index' %}">トップページに戻る</a>
+			<a href="{% url 'blogs:delete' pk=blog.id %}">削除する</a>
+			<a href="{% url 'blogs:update' pk=blog.id %}">更新する</a>
+		</div>
+	</div>
+
+	
+	<div style="width: 70%; margin: 0px auto">
+		<h2 style="text-align: center">コメント</h2>
+		<ul>
+			{% for comment in comment %}
+			<li>
+				<strong>{{ comment.text }}</strong> - {{ comment.created_datetime }}
+				<a href="{% url 'blogs:commentcreate' pk=blog.id %}">コメントする</a>
+				<a
+					href="{% url 'blogs:commentdetail' blog_id=blog.id comment_id=comment.id %}"
+					>記事を読む</a
+				>
+
+				{% endfor %}
+			</li>
+		</ul>
+	</div>
+
+	
+</body>
+<section class="section">
+	<div class="container">
+		
+		<hr />
+
+		
+		<div class="content">{{ blog.text | linebreaks }}</div>
+		<a href="{% url 'blogs:comment_create' pk=blog.pk %}">コメントする</a>
+
+		<hr />
+		<h2 class="title is-5">コメント一覧</h2>
+		{% for comment in comment_list %}
+                <div class="box">
+                    <p>{{ comment.text }}</p>
+					
+                    <a href="{% url 'blogs:reply_create' comment_id=comment.pk %}">返信する</a>
+                    {% with reply_list=comment.comment_set.all %}
+                        {% include 'blogs/includes/reply.html' %}
+                    {% endwith %}
+                </div>
+		{% endfor %}
+	</div>
+</section>
+{% endblock %}
