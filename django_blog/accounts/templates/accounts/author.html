@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block content %} 
+<div class="container">
+    <div class="header">
+        <h1>{{ author.username }}のプロフィール</h1>
+    </div>
+    
+
+
+            
+    <div class="profile-section">
+        <img src="{{ author.profile.url }}" alt="プロフィール画像">            
+        <div class="profile-details">
+            
+            <p>ユーザー名: {{ author.username }}</p>
+            
+            
+            <p>登録日: {{ author.date_joined|date:"Y年m月d日 H:i" }}</p>
+        </div>
+    </div>
+    
+
+    <!-- 自己紹介 -->
+    <div class="content">
+    <h3>自己紹介</h3>
+    <p>{{ author.introduction|default:"自己紹介がまだ登録されていません。" }}</p>
+    </div>
+
+
+    <div class="content">
+    <h3>投稿一覧</h3>
+            <ul>
+            {% if blogs %}
+            {% for blog in blogs %}
+                <li>
+                    <a href="{% url 'blogs:detail' pk=blog.pk %}">{{ blog.title }}</a>
+                </li>
+            {% endfor %}
+            {% else %}
+                <p>まだ投稿されていません。</p>
+            {% endif %}
+            </ul>
+    </div>
+
+    <div class="button-section">
+        <a href="{% url 'blogs:index' %}" >トップページに戻る</a>
+    </div>
+</div>
+{% endblock %}

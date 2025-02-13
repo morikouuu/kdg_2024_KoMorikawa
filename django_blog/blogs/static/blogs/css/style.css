@@ -1,10 +1,81 @@
 a{
     text-decoration: none;
 }
-
+.navbar navbar-expand-sm navbar-dark bg-dark {
+    position: sticky;
+}
 .custom-image {
     width: 40px; /* 横幅を画面全体に */
     height: auto; /* アスペクト比を維持 */
     }
 
 
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 30px auto;
+        background: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    .profile-section {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+    }
+    .profile-section img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 20px;
+    }
+    .profile-details {
+        flex-grow: 1;
+    }
+    .profile-details h2 {
+        margin: 0;
+        font-size: 24px;
+        color: #333;
+    }
+    .profile-details p {
+        margin: 5px 0;
+        color: #666;
+    }
+    .content {
+        padding: 20px;
+        border-top: 1px solid #ddd;
+    }
+    .content h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .button-section {
+        text-align: center;
+        padding: 20px;
+        border-top: 1px solid #ddd;
+    }
+    .button-section a {
+        display: inline-block;
+        margin: 0 10px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .button-section a:hover {
+        background-color: #45a049;
+    }

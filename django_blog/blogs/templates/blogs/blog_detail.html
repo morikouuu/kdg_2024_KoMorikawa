@@ -1,33 +1,97 @@
-{% extends '../base.html' %} {% block content %}
+{% extends '../base.html' %} 
+{% block extrajs %}
+<script type="text/javascript">
+  // いいねボタンが押された時
+  document.getElementById('ajax-like').addEventListener('click', e => {
+    e.preventDefault();
+    const url = '{% url "blogs:like" %}';
+    fetch(url, {
+      method: 'POST',
+      body: `blog_pk={{ blog.pk }}`,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+    }).then(response => {
+      return response.json();
+    }).then(response => {
+      // いいね数を書き換える
+      const counter = document.getElementById('like-count')
+      counter.textContent = response.like_count
+      const icon = document.getElementById('like-icon')
+      // いいねした時はハートを塗る
+      if (response.method == 'create') {
+        icon.classList.remove('far')
+        icon.classList.add('fas')
+        icon.id = 'like-icon'
+      } else {
+        icon.classList.remove('fas')
+        icon.classList.add('far')
+        icon.id = 'like-icon'
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+{% block content %}
 <head>
 	<title>ブログ</title>
 </head>
 <body>
-	<h1 style="text-align: center">{{ blog.title }}</h1>
+	<h1 style="text-align: center" class="title">{{ blog.title }}</h1>
 	<div style="width: 70%; margin: 0px auto">
 		{% if blog.picture %}
-			<div class = "container"></div>
+			
 			<img src="{{ blog.picture.url }}" alt="Blog Image" class img/>
 		{% endif %}
-		</div>
 		
-		<div style="text-align: center; margin-top: 50px">
-			<a href="{% url 'blogs:index' %}">トップページに戻る</a>
-			<a href="{% url 'blogs:delete' pk=blog.id %}">削除する</a>
-			<a href="{% url 'blogs:update' pk=blog.id %}">更新する</a>
-		</div>
+		<p>作成日{{blog.created_datetime}}
+		</p>
+		<p>投稿者: <a href="{% url 'accounts:author' pk=blog.author.pk %}">{{ blog.author.username }}</a></p>
+		<p>投稿者のID: {{ blog.author.pk }}</p>
+		
+		
 	</div>
+	
+		<div style="text-align: center; margin-top: 50px" class="button-section">
+			<a href="{% url 'blogs:index' %}" class='btn btn-outline-primary'>トップページに戻る</a>
+			<a href="{% url 'blogs:delete' pk=blog.id %}" class='btn btn-outline-primary'>削除する</a>
+			<a href="{% url 'blogs:update' pk=blog.id %}" class='btn btn-outline-primary'>更新する</a>
+		</div>
+
+		<div class="card-header">
+			{% if is_user_liked %}
+			<button type="button" id="ajax-like" style="border:none;background:none">
+			  <!-- すでにいいねしている時はfasクラス -->
+			  <i class="fas fa-heart text-danger" id="like-icon"></i>
+			</button>
+			{% else %}
+			<button type="button" id="ajax-like" style="border:none;background:none">
+			  <!-- いいねしていないときはfarクラス -->
+			  <i class="far fa-heart text-danger" id="like-icon"></i>
+			</button>
+			{% endif %}
+			<!-- いいねの数 -->
+			<span id="like-count">{{ like_count }}</span>
+			<span>いいね</span>
+		</div>
+	
 
 	
 	<div style="width: 70%; margin: 0px auto">
-		<h2 style="text-align: center">コメント</h2>
+		<h2 style="text-align: center">text</h2>
 		<ul>
 			{% for comment in comment %}
 			<li>
 				<strong>{{ comment.text }}</strong> - {{ comment.created_datetime }}
-				<a href="{% url 'blogs:commentcreate' pk=blog.id %}">コメントする</a>
+				<a href="{% url 'blogs:commentcreate' pk=blog.id %} " class='btn btn-outline-primary'>コメントする</a>
 				<a
-					href="{% url 'blogs:commentdetail' blog_id=blog.id comment_id=comment.id %}"
+					href="{% url 'blogs:commentdetail' blog_id=blog.id comment_id=comment.id %}" class='btn btn-outline-primary'
 					>記事を読む</a
 				>
 
@@ -45,7 +109,7 @@
 
 		
 		<div class="content">{{ blog.text | linebreaks }}</div>
-		<a href="{% url 'blogs:comment_create' pk=blog.pk %}">コメントする</a>
+		<a href="{% url 'blogs:comment_create' pk=blog.pk %} " class='btn btn-outline-primary'>コメントする</a>
 
 		<hr />
 		<h2 class="title is-5">コメント一覧</h2>
@@ -53,7 +117,7 @@
                 <div class="box">
                     <p>{{ comment.text }}</p>
 					
-                    <a href="{% url 'blogs:reply_create' comment_id=comment.pk %}">返信する</a>
+                    <a href="{% url 'blogs:reply_create' comment_id=comment.pk %}" class='btn btn-outline-primary'>返信する</a>
                     {% with reply_list=comment.comment_set.all %}
                         {% include 'blogs/includes/reply.html' %}
                     {% endwith %}
@@ -62,3 +126,4 @@
 	</div>
 </section>
 {% endblock %}
+

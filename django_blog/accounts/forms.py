@@ -1,0 +1,12 @@
+from django import forms
+from django.contrib.auth.password_validation import validate_password
+from .models import CustomUser
+
+from django.contrib.auth.forms import UserCreationForm
+
+
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = CustomUser
+        fields = ['username', 'email', 'first_name', 'last_name','date_of_birth','email','profile'] 

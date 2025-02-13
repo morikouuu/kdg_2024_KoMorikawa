@@ -1,17 +1,18 @@
 from django.db import models
+from accounts.models import CustomUser
+
+
 
 
 
 # Create your models here.
-class Category(models.Model):
-    name = models.CharField(blank=True, null=True, max_length=150)
 
 class Blog(models.Model):
     title = models.CharField(blank=False, null=False, max_length=150)
     
     picture = models.ImageField(null=True,blank=True)
     text = models.TextField(blank=True)
-
+    author = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
     
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
@@ -42,3 +43,6 @@ class Reply(models.Model):
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
 
+class Likes(models.Model):
+    user_id = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    target = models.ForeignKey(Blog,on_delete= models.CASCADE)

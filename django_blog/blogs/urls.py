@@ -12,5 +12,8 @@ urlpatterns = [
     path('detail/<int:blog_id>/comment/<int:comment_id>/', views.CommentDetailView.as_view(), name='commentdetail'),
     
     path('comment/<int:pk>/', views.comment_create, name='comment_create'),
+    path('like/', views.like, name='like'),
     path('reply/<int:comment_id>/', views.reply_create, name='reply_create'),
+    # path('favorite/<int:pk>',views.favorite,name='favorite'),
+    # path('unfavorite/<int:pk>',views.unfavorite,name='unfavorite'),
 ] 

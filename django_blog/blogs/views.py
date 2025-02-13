@@ -1,11 +1,16 @@
 from django.shortcuts import render,get_object_or_404, redirect
-from .models import Blog,Comment,Reply
+from .models import Blog,Comment,Reply,Likes
 from django.views.generic  import ListView,DetailView,CreateView,DeleteView,UpdateView
 from django.urls import reverse_lazy
 from django.views import generic
 from django import forms
 from .models import  Comment
+from django.contrib.auth.decorators import login_required
+
+
+
 from .forms import SearchForm
+from django.http.response import JsonResponse
 CommentForm = forms.modelform_factory(Comment, fields=('text', ))
 
 # Create your views here
@@ -33,8 +38,21 @@ class BlogDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
+        
         context['comment_list'] = self.object.comment_set.filter(parent__isnull=True)
+        
+        #like
+        like_count = self.object.likes_set.count()
+        context['like_count'] = like_count
+
+        
+        if self.request.user.is_authenticated:
+            context['is_user_liked'] = self.object.likes_set.filter(user_id=self.request.user).exists()
+        else:
+            context['is_user_liked'] = False
+        
         return context
+ 
 
 def comment_create(request, pk):
     
@@ -78,12 +96,12 @@ def reply_create(request, comment_id):
 
 class CreateView(CreateView):
     model = Blog
-    fields = '__all__'
+    fields = ['title','picture','text',]
     template_name = 'blogs/blog_form.html'
     success_url = reverse_lazy('blogs:index')
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super(CreateView, self).form_valid(form)
+        return super().form_valid(form)
     
 class DeleteView(DeleteView):
     model = Blog
@@ -96,7 +114,7 @@ class UpdateView(UpdateView):
     template_name = 'blogs/blog_form.html'
     
     def get_success_url(self):
-        return reverse_lazy('blogs:detail', kwargs={'blog_id': self.object.pk})
+        return reverse_lazy('blogs:detail', kwargs={'pk': self.object.pk})
     
 
 class CommentCreateView(CreateView):
@@ -116,13 +134,13 @@ class CommentCreateView(CreateView):
         return reverse_lazy('blogs:index')
     
 class ReplyCreateView(CreateView):
-    model = Comment
-    fields = ['text']  
-    template_name = 'blogs/comment_form.html'
-    success_url = reverse_lazy('blogs:index')
+     model = Comment
+     fields = ['text']  
+     template_name = 'blogs/comment_form.html'
+     success_url = reverse_lazy('blogs:index')
 
-    def form_valid(self, form):
-        # overraide
+     def form_valid(self, form):
+        
         blog_id = self.kwargs['pk']
         blog = get_object_or_404(Blog, id=blog_id)
         parent = self.kwargs.get('pk')
@@ -137,7 +155,7 @@ class ReplyCreateView(CreateView):
 
         return super(ReplyCreateView, self).form_valid(form)
 
-    def get_success_url(self):
+     def get_success_url(self):
         return reverse_lazy('blogs:detail', kwargs={'blog_id': self.kwargs['blog_id']})
 
 class CommentDetailView(DetailView):
@@ -150,4 +168,26 @@ class CommentDetailView(DetailView):
         comment = get_object_or_404(Comment, pk=self.kwargs['comment_id'], blog=blog)
         return comment
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Likes, Blog
+from accounts.models import CustomUser
 
+def like(request):
+    blog_pk = request.POST.get('blog_pk')
+    context = {
+        'user_id': f'{ request.user }',
+    }
+    blog = get_object_or_404(Blog, pk=blog_pk)
+    like = Likes.objects.filter(target=blog, user_id=request.user)
+ 
+    if like.exists():
+        like.delete()
+        context['method'] = 'delete'
+    else:
+        like.create(target=blog, user_id=request.user)
+        context['method'] = 'create'
+ 
+    context['like_count'] = blog.likes_set.count()
+ 
+    return JsonResponse(context)
